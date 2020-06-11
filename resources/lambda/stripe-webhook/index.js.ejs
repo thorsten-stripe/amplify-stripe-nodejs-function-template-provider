@@ -1,0 +1,46 @@
+<%= props.topLevelComment %>
+
+/*
+ * This function implements a Stripe webhook handler to handle
+ * fulfillment for our successful payments.
+ *
+ * @see https://stripe.com/docs/payments/handling-payment-events
+ *
+ * NOTE: You need to make the following environment variables available to this function:
+ * STRIPE_SECRET_KEY (can be found at https://dashboard.stripe.com/apikeys)
+ * STRIPE_WEBHOOK_SECRET (can be set up at https://dashboard.stripe.com/webhooks)
+ */
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: '2020-03-02',
+  maxNetworkRetries: 2,
+});
+
+exports.handler = async (event) => {
+  const { body, headers } = event;
+  try {
+    const event = stripe.webhooks.constructEvent(
+      body,
+      headers['stripe-signature'],
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
+
+    if (event.type === 'payment_intent.succeeded') {
+      const paymentIntent = event.data.object;
+      console.log(`Payment status: ${paymentIntent.status}`);
+      
+      /* Your business logic goes here. E.g. mark the order in your DB as paid. */
+    }
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ received: true }),
+    };
+  } catch (err) {
+    console.log(`Stripe webhook failed with ${err}`);
+
+    return {
+      statusCode: 400,
+      body: `Webhook Error: ${err.message}`,
+    };
+  }
+};

@@ -1,0 +1,23 @@
+{
+  "name": "functionTemplate",
+  "type": "util",
+  "commands": [],
+  "eventHandlers": [],
+  "functionTemplate": {
+    "conditions": {
+      "provider": "awscloudformation",
+      "service": "Lambda",
+      "runtime": "nodejs"
+    },
+    "templates": [
+      {
+        "name": "Stripe Checkout session creation handler",
+        "value": "stripe-checkout-session"
+      },
+      {
+        "name": "Stripe webhook event handler",
+        "value": "stripe-webhook"
+      }
+    ]
+  }
+}
